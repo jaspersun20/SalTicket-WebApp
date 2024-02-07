@@ -1,0 +1,78 @@
+@charset "UTF-8";
+#navbar-logged{
+		margin-top: 0px;
+		background-color: #545AA7;
+	}
+	
+
+.nav li{
+		/*witdh=720 every menu=720/4=180*/
+		width: 300px;
+		list-style-type: none;
+	}
+
+.nav > ul{
+	display: flex;
+	align-items: flex-start;
+}
+
+		
+.nav a {
+	text-decoration: none;
+	color: #FFF;
+	display: block;
+	height: 50px;
+	line-height: 50px;
+	font-family: Noto Sans, sans-serif;
+}
+
+.right {
+   	margin-left: auto;
+}
+
+.right > ul {
+    display: flex;
+    align-items: flex-start;
+    position:relative;
+}
+
+.right li {
+    width: 200px;
+}
+
+#home {
+	position: absolute;
+    right: 150px;
+}
+
+#homelog {
+	position: absolute;
+    right: 260px;
+}
+
+#favorites {
+	position: absolute;
+    right:160px;
+}
+
+#wallet {
+	position: absolute;
+    right: 90px;
+}
+
+#home {
+	position: absolute;
+    right: 170px;
+}
+
+.logo{
+	font-size: 1.3em;
+}
+
+
+.container{
+	display: flex;
+	margin-left: auto;
+	flex-direction: column;
+}
+

@@ -1,0 +1,97 @@
+@charset "UTF-8";
+#navbar{
+		background-color: #545AA7;
+	}
+	
+
+#nav li{
+		/*witdh=720 every menu=720/4=180*/
+		width: 300px;
+		list-style-type: none;
+	}
+
+#nav > ul{
+	display: flex;
+	align-items: flex-start;
+}
+
+		
+#nav a {
+	text-decoration: none;
+	color: #FFF;
+	display: block;
+	height: 50px;
+	line-height: 50px;
+	font-family: Noto Sans, sans-serif;
+}
+#container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+   height: 100%;
+}
+
+.form-container {
+  display: flex;
+  width: 100%;
+  justify-content: center;
+  gap: 40px;
+}
+
+.two-column-form {
+  flex: 1;
+}
+
+.right {
+   	margin-left: auto;
+}
+
+.right > ul {
+    display: flex;
+    align-items: flex-start;
+    position:relative;
+}
+
+.right li {
+    width: 200px;
+}
+
+#home {
+	position: absolute;
+    right: 170px;
+}
+
+#logo{
+	font-size: 1.3em;
+}
+
+.textbox{
+	width:260px;
+	height:30px;
+	margin-top:10px;
+	border-radius: 10px;
+}
+
+
+.button{
+	background:darkred;
+    color:white;
+    border-style:outset;
+    height:40px;
+    width:270px;
+    font-size:1.0em;
+    margin-left: auto;
+    margin-top:10px;
+    margin-bottom:10px;
+    border-radius:10px;
+    font-family: Noto Sans, sans-serif;
+}
+
+h2{
+	color: grey;
+	font-family: Noto Sans, sans-serif;
+}
+label{
+	color: grey;
+	font-family: Noto Sans, sans-serif;
+}

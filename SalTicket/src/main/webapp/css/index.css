@@ -1,0 +1,172 @@
+@charset "UTF-8";
+#navbar{
+		background-color: #545AA7;
+		display: block;
+	}
+	
+#navbar-logged{
+		margin-top: 0px;
+		background-color: #545AA7;
+		display: none;
+	}
+	
+
+.nav li{
+		/*witdh=720 every menu=720/4=180*/
+		width: 300px;
+		list-style-type: none;
+	}
+
+.nav > ul{
+	display: flex;
+	align-items: flex-start;
+}
+
+		
+.nav a {
+	text-decoration: none;
+	color: #FFF;
+	display: block;
+	height: 50px;
+	line-height: 50px;
+	font-family: Noto Sans, sans-serif;
+}
+
+.right {
+   	margin-left: auto;
+}
+
+.right > ul {
+    display: flex;
+    align-items: flex-start;
+    position:relative;
+}
+
+.right li {
+    width: 200px;
+}
+
+#home {
+	position: absolute;
+    right: 150px;
+}
+
+#homelog {
+	position: absolute;
+    right: 260px;
+}
+
+#favorites {
+	position: absolute;
+    right:160px;
+}
+
+#wallet {
+	position: absolute;
+    right: 90px;
+}
+
+#home {
+	position: absolute;
+    right: 170px;
+}
+
+.logo{
+	font-size: 1.3em;
+}
+
+#searchform{
+	width:600px;
+	/* position: absolute;
+	left:400px;
+	top:100px; */
+	margin: 60px auto;
+	background: grey;
+	color: white;
+}
+
+#sform{
+	border-collapse: separate;
+
+	padding: 10px;
+}
+fieldset{
+	border: 0;	
+}
+
+#search{
+	text-align:center;
+	font-size:2.7em;
+	margin:20px;
+	font-family: Palatino, URW Palladio L, serif;
+	font-weight: 100;
+}
+#middle{
+	text-align:center;
+}
+
+.textbox{
+	width:560px;
+	height:30px;
+	margin-top:10px;
+	border-radius: 10px;
+}
+.required-label::after {
+    content: " *"; 
+    color: red; 
+}
+
+.button{
+	background:darkorange;
+    color:white;
+    border-style:outset;
+    border-color:orangered;
+    height:60px;
+    width:200px;
+    font-size:1.3em;
+    margin-left: auto;
+    margin-top:10px;
+    margin-bottom:10px;
+    border-radius:10px;
+    font-family: Noto Sans, sans-serif;
+}
+
+#hiddentable{
+	display: none;
+}
+
+.tablecontainer{
+	display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+   
+}
+
+.whitetitle{
+	color: white;
+}
+
+th{
+	border: 1px solid #000;
+	padding: 10px 0px;
+	text-align: center;
+    vertical-align: middle; /* Center content vertically */
+	width: 300px;
+}
+
+td{
+	border: 1px solid #000;
+	width: 130px;
+	height: 100px;
+	text-align: center; /* Center content horizontally */
+    vertical-align: middle; /* Center content vertically */
+	
+}
+table{
+	border-collapse: collapse;
+}
+img{
+	width:100px;
+	height:60px;
+}

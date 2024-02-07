@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>SalTickets Login</title>
+<link rel="stylesheet" href="css/login.css">
+</head>
+<body>
+<div id="navbar">
+	<div id="nav">
+		<ul>
+			<li><a  id="logo">SalTickets</a></li>
+			<li class = "right">
+				<ul>
+					<li><a href="index.html" id="home">Home</a></li>
+					<li><a href="login.html">Login / Sign Up</a></li>
+				</ul>
+			</li>
+		</ul>
+	</div>
+</div>
+<div id = "container">
+	<div class = "form-container">
+		<form action="RegisterServlet" method="post">
+		<div class="two-column-form">
+		    	<h2>Login</h2>
+		        <label for="username">Username:</label>
+		        <br>
+		        <input type="text" class="textbox" name="username" id="username">
+		        <br>
+		        <br>
+		        <label for="password">Password:</label>
+		        <br>
+		        <input type="password" class="textbox" name="password">
+		        <br>
+		        <br>
+		        <button class="button" type="submit" id="log" name="submit" value="Submit">Submit Query</button>
+		        <br>
+		</div>
+		</form>
+		<form action="LoginServlet" method="post" id="loginform">
+		    <div class="two-column-form">
+		    	<h2>Sign Up</h2>
+		        <label for="email">Email:</label>
+		        <br>
+		        
+		        <input type="email" class="textbox" name="email">
+		        <br>
+		        <br>
+		         <label for="logusername">Username:</label>
+		         <br>
+		        <input type="text" class="textbox" id="logusername" name="logusername">
+		        <br>
+		        <br>
+		        <label for="logpassword">Password:</label>
+		        <br>
+		        <input type="password" class="textbox" id="logpassword" name="logpassword">
+		        <br>
+		        <br>
+		        <label for="confirm-password">Confirm Password:</label>
+		        <br>
+		        <input type="password" class="textbox" id="confirmpassword" name="confirmpassword">
+		        <br>
+		        <br>
+		        <button class="button" type="submit" name="signup" id = "signup" value="Register">Submit Query</button>
+		    </div>
+		</form>
+	</div>
+</div>
+<script src="login.js"></script>
+</body>
+</html>

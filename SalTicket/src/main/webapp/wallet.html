@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>SalTickets Wallet</title>
+<link rel="stylesheet" href="css/wallet.css">
+<script>
+function setCookie(name, value, daysToLive){
+    const date = new Date();
+    date.setTime(date.getTime() +  (daysToLive * 24 * 60 * 60 * 1000));
+    let expires = "expires=" + date.toUTCString();
+    document.cookie = `${name}=${value}; ${expires}; path=/`
+}
+
+function getCookie(name){
+    const cDecoded = decodeURIComponent(document.cookie);
+    const cArray = cDecoded.split("; ");
+    let result = null;
+    
+    cArray.forEach(element => {
+        if(element.indexOf(name) == 0){
+            result = element.substring(name.length + 1)
+        }
+    })
+    return result;
+}
+function sendDataToWalletServlet() {
+	  // Read the cookie value
+	  let eventId = getCookie("Eventid");
+	  let uname = getCookie("Name");
+	  let minprice = getCookie("Minprice");
+	  console.log("js wallet func:" + eventId);
+	  console.log("js wallet func:" +uname);
+	  let ticketNum = document.getElementById(`ticketnum${eventId}`).value;
+	  console.log("js wallet func:" +ticketNum);
+	  // Check if the cookie exists
+	  if (eventId&&uname) {
+	    // Send a POST request to the servlet with the eventId as a parameter
+	    fetch("WalletServlet", {
+	      method: "POST",
+	      headers: {
+	        "Content-Type": "application/x-www-form-urlencoded"
+	      },
+	      body: "Eventid=" + encodeURIComponent(eventId) + "&Name=" + encodeURIComponent(uname) + "&TicketNum=" + encodeURIComponent(ticketNum) + "&Minprice=" + encodeURIComponent(minprice)
+	      
+	    })
+	      .then((response) => {
+	        if (response.ok) {
+	          return response.text();
+	        } else {
+	          throw new Error("Error sending data to the servlet.");
+	        }
+	      })
+	      .then((data) => {
+	        // Handle the servlet response here
+	        console.log("Response from servlet:", data);
+	      })
+	      .catch((error) => {
+	        console.error("Error:", error);
+	      });
+	  } else {
+	    console.log("Eventid and/or Name cookies not found.");
+	  }
+	}
+	
+function sendDataToWalletSellServlet(name) {
+	  // Read the cookie value
+	  let eventId = getCookie("Eventid");
+	  let uname = getCookie("Name");
+	  let maxprice = getCookie("Maxprice");
+	  console.log("js wallet sell func:" + eventId);
+	  console.log("js wallet sell func:" +uname);
+	  let ticketNum = document.getElementById(`ticketnum${eventId}`).value;
+	  console.log("js wallet sell func:" +ticketNum);
+	  // Check if the cookie exists
+	  if (eventId&&uname) {
+	    // Send a POST request to the servlet with the eventId as a parameter
+	    fetch("SellWalletServlet", {
+	      method: "POST",
+	      headers: {
+	        "Content-Type": "application/x-www-form-urlencoded"
+	      },
+	      body: "Eventid=" + encodeURIComponent(eventId) + "&Name=" + encodeURIComponent(uname) + "&TicketNum=" + encodeURIComponent(ticketNum) + "&Maxprice=" + encodeURIComponent(maxprice)
+	      
+	    })
+	      .then((response) => {
+	        if (response.ok) {
+	          return response.json();
+            } else {
+                throw new Error("Error sending data to the servlet.");
+            }
+	       
+	      })
+	      .then((jsonResponse) => {
+	    	  console.log(jsonResponse);
+                // Handle the servlet response here
+                let operationResult = jsonResponse["result"];
+                handleOperationResult(operationResult,name);
+            })
+	      .catch((error) => {
+	        console.error("Error:", error);
+	      });
+	  } else {
+	    console.log("Eventid and/or Name cookies not found.");
+	  }
+	  
+	  function handleOperationResult(operationResult,uname) {
+		    if (operationResult === 0) {
+		        alert("FAILED: Sale not possible");
+		    } else if (operationResult === 1) {
+		        alert('Sold ' + ticketNum + " " + uname + ' tickets');
+		        location.reload();
+		    }
+	}
+}
+function toggleCheckbox(currentCheckboxId, otherCheckboxId) {
+	  const currentCheckbox = document.getElementById(currentCheckboxId);
+	  const otherCheckbox = document.getElementById(otherCheckboxId);
+
+	  if (currentCheckbox.checked) {
+	    otherCheckbox.checked = false;
+	  }
+	}
+	
+	
+function alertPurchase(name, id, minprice, maxprice, uniqueId){
+	setCookie("Eventid", id, 365);
+	setCookie("Minprice", minprice, 365);
+	setCookie("Maxprice", maxprice, 365);
+	if(minprice==-1){
+		alert("FAILED: Purchase not possible");
+		return;
+	}
+	let ticketNum = document.getElementById(`ticketnum${uniqueId}`).value;
+	const bCheckbox = document.getElementById(`buyCheckbox${uniqueId}`);
+	const sCheckbox = document.getElementById(`sellCheckbox${uniqueId}`);
+	if(ticketNum>0){
+		if(bCheckbox.checked){
+			sendDataToWalletServlet();
+			alert('Bought ' + ticketNum +" " + name + ' tickets');
+			location.reload();
+		}
+		else if(sCheckbox.checked){
+			sendDataToWalletSellServlet(name);
+			
+		}
+	}
+	else{
+		alert('FAILED: Purchase not possible');
+	}
+	
+	
+}
+
+
+function displaywallet(id, ticket, uniqueId){
+	var url = "https://us-west2-csci201-376723.cloudfunctions.net/explore-events/eventDetail/" + id;
+	fetch(url)
+	.then(function(response){
+		return response.json();
+	})
+	.then(function(tours){
+		  let placeholder = document.getElementById("dataoutput");
+		  let out = "";
+		  let pricemin = tours.price.min;
+		  let pricemax = tours.price.max;
+		  let priceDif = pricemax - pricemin;
+		  if(priceDif !=0){
+			  priceDif = "+" + priceDif;
+		  }
+		  out += `
+		  
+		  	<div class="favbox" style="margin-left: 100px; margin-top: 40px;">
+		  	<div class="fav" style="display: flex; flex-direction: column; align-items: center; width: 1150px; padding-top: 10px; margin: 20px;">
+		    <div class="tourname" style="background-color: #f2f2f2; text-align:left; border: 1px solid #ccc; padding-left: 20px; width: 950px;padding-right: 20px; ">
+		      <h3 style="font-size: 1.2em">${tours.event.name}</h3>
+		    </div>
+		    
+		    <div class="table" style="text-align:center; border: 1px solid #ccc; padding-left: 20px; width: 950px;padding-right: 20px; border-top: 0;">
+		      <table style="border-collapse: collapse; margin-top: 40px; margin-bottom: 40px;">
+		        <tr>
+		          <td>Quantity:</td>
+		          <td>${ticket}</td>
+		          <td>Change:</td>
+		          <td style="color:green;">${priceDif}</td>
+		        </tr>
+		        <tr>
+		          <td>Avg. Cost:</td>
+		          <td>${pricemin}</td>
+		          <td>Current Price:</td>
+		          <td>${pricemax}</td>
+		        </tr>
+		        <tr>
+		          <td>Total Cost:</td>
+		          <td>${pricemin*ticket}</td>
+		          <td>Market Value:</td>
+		          <td>${pricemax*ticket}</td>
+		        </tr>
+		      </table>
+		    </div>
+		    <div class="operation" style="text-align:center; border: 1px solid #ccc; padding-left: 20px; width: 950px;padding-right: 20px; background-color: #f2f2f2; margin-bottom: 10px; border-top: 0;">
+			<div class="namee" style=" margin-top:30px"> 
+		    	<label for="ticketnum" style="margin-top:20px;">Quantity: </label><input type="number" id="ticketnum${uniqueId}" name="ticketnum"
+			        min="0">
+			    <br>
+			    <br>
+			    <label for="buyCheckbox">Buy:</label>
+			    <input type="checkbox" id="buyCheckbox${uniqueId}" name="buyCheckbox" onclick="toggleCheckbox('buyCheckbox${uniqueId}', 'sellCheckbox${uniqueId}')">
+			    <label for="sellCheckbox">Sell:</label>
+			    <input type="checkbox" id="sellCheckbox${uniqueId}" name="sellCheckbox" onclick="toggleCheckbox('sellCheckbox${uniqueId}', 'buyCheckbox${uniqueId}')">
+			    <br>
+			    <br>
+			  	<button class="button" type="submit" name="purchase" id="purchase${uniqueId}" style="background:lightgrey;
+				    color:white;
+			    border-style:outset;
+			    border-color:grey;
+			    height:40px;
+			    width:140px;
+			    font-size:1.0em;
+			    margin-left: auto;
+			    margin-top:10px;
+			    margin-bottom:10px;
+			    font-family: Noto Sans, sans-serif;" onclick="alertPurchase('${tours.event.name}', '${id}', '${pricemin}', '${pricemax}', '${uniqueId}')">Submit</button>
+			    </div>
+			    </div>
+		  	</div>
+		  	</div>
+		    `;
+		  placeholder.insertAdjacentHTML("beforeend", out);
+		});
+}
+
+function displayAccount(){
+	// Read the cookie value
+	  let eventId = getCookie("Eventid");
+	  let uname = getCookie("Name");
+	  // Check if the cookie exists
+	  if (eventId&&uname) {
+	    // Send a POST request to the servlet with the eventId as a parameter
+	    fetch("AccountServlet", {
+	      method: "POST",
+	      headers: {
+	        "Content-Type": "application/x-www-form-urlencoded"
+	      },
+	      body: "Eventid=" + encodeURIComponent(eventId) + "&Name=" + encodeURIComponent(uname)
+	      
+	    })
+	      .then(function(response){
+	    	  return response.json();
+	      })
+	      .then(function(data){
+	        // Handle the servlet response here
+	        console.log("Response from accountservlet:", data);
+	        
+	        let money = data.money;
+            let account = data.account;
+            console.log(money)
+            let placeholder = document.getElementById("accountinfo");
+     	     let out = "";
+     	   out += `
+     	   		<p>Cash Balance: $${data.money}</p>
+     	   		<p>Total Account Value: $${data.account}</p>
+     	   `;
+     	   placeholder.innerHTML = out;
+            
+            
+	      })
+	      .catch((error) => {
+	        console.error("Error:", error);
+	      });
+	  } else {
+	    console.log("Eventid and/or Name cookies not found.");
+	  }
+}
+
+function fetchData() {
+	let uname = getCookie("Name");
+  fetch("DisplayWalletServlet", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded"
+    },
+    body: "Name=" + encodeURIComponent(uname) 
+  })
+    .then((response) => {
+      if (response.ok) {
+        return response.json();
+      } else {
+        throw new Error("Error fetching data from the servlet.");
+      }
+    })
+    .then(function(data){
+  	   displayAccount();
+      if (data === null || data.length === 0) {
+    	    alert("You have no favorites!");
+    	  }
+      else{
+    	  data.event_id.forEach((eventID, index) => {
+    	      let ticketNum = data.ticketnum[index];
+    	      displaywallet(eventID, ticketNum, eventID);
+    	    });
+      }
+  })
+    .catch((error) => {
+      console.error("Error:", error);
+    });
+}
+fetchData();
+</script>
+<style>
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+
+td {
+  border: 1px solid black;
+  padding: 8px;
+  text-align: center;
+}
+
+
+</style>
+</head>
+<body>
+<div id="navbar-logged">
+	<div class="nav">
+		<ul>
+			<li><a  class="logo">SalTickets</a></li>
+			<li class = "right">
+				<ul>
+					<li><a href="index.html" id="homelog">Home</a></li>
+					<li><a href="favorites.html" id="favorites">Favorites</a></li>
+					<li><a href="wallet.html" id="wallet">Wallet</a></li>
+					<li><a href="index.html" id="logout">Logout</a></li>
+				</ul>
+			</li>
+		</ul>
+	</div>
+</div>
+
+<div class="container" style="flex-direction: column;">
+<p style="font-size: 2.0em; margin-left: 200px;">My Wallet:</p>
+	<div id="accountinfo" style="font-size: 1.0em; margin-left: 200px;">  </div>
+	<div id=dataoutput style=" justify-content: center; margin-top:0;">
+	
+	
+	</div>
+
+</div>
+
+</body>
+</html>

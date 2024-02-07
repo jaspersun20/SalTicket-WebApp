@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>SalTickets</title>
+<link rel="stylesheet" href="css/index.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<style>
+.eventdetail-container{
+	display:flex;
+    align-items: center;
+    justify-content: center;
+    height: 120%;
+    background-color: grey;
+    color: white;
+    margin-top: 60px;
+    margin-left:240px;
+    width: 1000px;
+    border-radius:18px;
+    font-family: Noto Sans, sans-serif;
+   
+}
+
+#eventoutput{
+	display:block;
+	width: 800px;
+	
+}
+#favorites-sign{
+	cursor:pointer;
+}
+</style>
+<script>
+function getCookie(name){
+    const cDecoded = decodeURIComponent(document.cookie);
+    const cArray = cDecoded.split("; ");
+    let result = null;
+    
+    cArray.forEach(element => {
+        if(element.indexOf(name) == 0){
+            result = element.substring(name.length + 1)
+        }
+    })
+    return result;
+}
+function sendDataToServlet() {
+	  // Read the cookie value
+	  let eventId = getCookie("Eventid");
+	  let uname = getCookie("Name");
+	  console.log("js func:" + eventId);
+	  console.log("js func:" +uname);
+
+	  // Check if the cookie exists
+	  if (eventId&&uname) {
+	    // Send a POST request to the servlet with the eventId as a parameter
+	    fetch("FavoritesServlet", {
+	      method: "POST",
+	      headers: {
+	        "Content-Type": "application/x-www-form-urlencoded"
+	      },
+	      body: "Eventid=" + encodeURIComponent(eventId) + "&Name=" + encodeURIComponent(uname)
+	      
+	    })
+	      .then((response) => {
+	        if (response.ok) {
+	          return response.text();
+	        } else {
+	          throw new Error("Error sending data to the servlet.");
+	        }
+	      })
+	      .then((data) => {
+	        // Handle the servlet response here
+	        console.log("Response from servlet:", data);
+	      })
+	      .catch((error) => {
+	        console.error("Error:", error);
+	      });
+	  } else {
+	    console.log("Eventid and/or Name cookies not found.");
+	  }
+	}
+	
+function sendDataToWalletServlet() {
+	  // Read the cookie value
+	  let eventId = getCookie("Eventid");
+	  let uname = getCookie("Name");
+	  let minprice = getCookie("Minprice");
+	  console.log("js wallet func:" + eventId);
+	  console.log("js wallet func:" +uname);
+	  let ticketNum = document.getElementById("ticketnum").value;
+	  console.log("js wallet minprice  func:" +minprice);
+	  // Check if the cookie exists
+	  if (eventId&&uname) {
+	    // Send a POST request to the servlet with the eventId as a parameter
+	    fetch("WalletServlet", {
+	      method: "POST",
+	      headers: {
+	        "Content-Type": "application/x-www-form-urlencoded"
+	      },
+	      body: "Eventid=" + encodeURIComponent(eventId) + "&Name=" + encodeURIComponent(uname) + "&TicketNum=" + encodeURIComponent(ticketNum) + "&Minprice=" + encodeURIComponent(minprice)
+	      
+	    })
+	      .then((response) => {
+	        if (response.ok) {
+	          return response.text();
+	        } else {
+	          throw new Error("Error sending data to the servlet.");
+	        }
+	      })
+	      .then((data) => {
+	        // Handle the servlet response here
+	        console.log("Response from servlet:", data);
+	      })
+	      .catch((error) => {
+	        console.error("Error:", error);
+	      });
+	  } else {
+	    console.log("Eventid and/or Name cookies not found.");
+	  }
+	}
+	
+function alertPurchase(name, minprice){
+	setCookie("Minprice", minprice, 365);
+	let ticketNum = document.getElementById("ticketnum").value;
+	if(ticketNum>0){
+		sendDataToWalletServlet();
+		alert('Bought ' + ticketNum +" " + name + ' tickets');
+	}
+	else{
+		alert('FAILED: Purchase not possible');
+	}
+}
+
+function toggleStar(name) {
+    const star = document.getElementById('favorites-sign');
+    if (star.classList.contains('fa-star-o')) {
+        star.classList.remove('fa-star-o');
+        star.classList.add('fa-star');
+        alert('Added ' + name + ' to favorites');
+        sendDataToServlet();
+    } else {
+        star.classList.remove('fa-star');
+        star.classList.add('fa-star-o');
+        alert('Removed from favorites');
+    }
+}
+function displayspecified(id){
+  setCookie("Eventid", id, 365);
+  username = getCookie("Name");
+  
+  if(username){
+	  var url = "https://us-west2-csci201-376723.cloudfunctions.net/explore-events/eventDetail/" + id;
+	  fetch(url)
+	  .then(function(response){
+	  return response.json();
+	  })
+	  .then(function(tours){
+	  let placeholder = document.getElementById("eventoutput");
+	  let out = "";
+	  let pricemin = tours.price.min;
+	  let pricemax = tours.price.max;
+	  let buttonDisabled = pricemin === -1 ? 'disabled' : '';
+	  let priceDisplay = (pricemin === -1 || pricemax === -1) ? "N/A" : `${pricemin} - ${pricemax}`;
+	  out += `
+	  	<h2 style="font-size: 2.5em">${tours.event.name} <i class="fa fa-star-o" id= "favorites-sign" onclick="toggleStar('${tours.event.name}')" style="color:white"></i></h2>
+	  	<div class="ticketinfo" style="display:flex; justify-content: space-between;">
+	  	<div class="leftticket" style="width: 39%;">
+		  	<h3 style="color:#96ded1; font-size:1.7em; font-family: Noto Sans, sans-serif;">Date</h3>
+		  	<p>${tours.date.localDate} ${tours.date.localTime}</p> 
+		  	<h3 style="color:#96ded1; font-size:1.7em; font-family: Noto Sans, sans-serif;">Venue</h3>
+		  	<p>${tours.event.venue}</p> 
+		  	<h3 style="color:#96ded1; font-size:1.7em; font-family: Noto Sans, sans-serif;">Price Range</h3>
+		  	<p>${priceDisplay}</p> 
+		  	<h3 style="color:#96ded1; font-size:1.7em; font-family: Noto Sans, sans-serif;">More Info</h3>
+		  	<a href="${tours.event.url}" target="_blank" style="text-decoration: none;">Ticketmaster</a>
+		 </div>
+		 
+		 <div class="leftticket" style="width: 59%;">
+		  	<h5 style="color:#96ded1; font-size:1.7em; font-family: Noto Sans, sans-serif; width:100%; height:20px; padding: 0; margin-top:28px">Quantity of Ticket to Purchase</h3>
+		  	<input type="number" id="ticketnum" name="ticketnum" style="width:400px; height:50px; border-radius:10px; margin-top:10px; background-color: grey; border-color: white; box-shadow: none; font-size:1.0em"
+		        min="0">
+		  	<br>
+		  	<br>
+		  	<button class="button" type="submit" name="purchase" id="purchase" style="background:darkorange;
+	    color:white;
+	    border-style:outset;
+	    border-color:orangered;
+	    height:60px;
+	    width:200px;
+	    font-size:1.0em;
+	    margin-left: 100px;
+	    margin-top:10px;
+	    margin-bottom:10px;
+	    border-radius:10px;
+	    font-family: Noto Sans, sans-serif;" ${buttonDisabled} onclick="alertPurchase('${tours.event.name}', '${pricemin}')">PURCHASE</button>
+		  	
+		 </div>
+	  	</div>
+	  	
+	    `;
+	  placeholder.innerHTML = out;
+	});
+  }
+}
+
+</script>
+</head>
+<body>
+<div id="navbar">
+	<div class="nav">
+		<ul>
+			<li><a  class="logo">SalTickets</a></li>
+			<li class = "right">
+				<ul>
+					<li><a href="index.html" id="home">Home</a></li>
+					<li><a href="login.html">Login / Sign Up</a></li>
+				</ul>
+			</li>
+		</ul>
+	</div>
+</div>
+<div id="navbar-logged">
+	<div class="nav">
+		<ul>
+			<li><a  class="logo">SalTickets</a></li>
+			<li class = "right">
+				<ul>
+					<li><a href="index.html" id="homelog">Home</a></li>
+					<li><a href="favorites.html" id="favorites">Favorites</a></li>
+					<li><a href="wallet.html" id="wallet">Wallet</a></li>
+					<li><a href="index.html" id="logout">Logout</a></li>
+				</ul>
+			</li>
+		</ul>
+	</div>
+</div>
+<div id="searchform">
+<form id="sform">
+<fieldset>
+<h2 id="search">Events Search</h2>
+<hr>
+<br>
+	<label for="kword" class="required-label"><b>Keyword</b></label>
+	<br>
+	<input type="text" name="kword" id = "kword" class="textbox" required>
+	<br>
+	<br>
+	<label for="location" class="required-label"><b>Location</b></label>
+	<br>
+	<input type="text" name="location" id = "location" class="textbox" required>
+	<br>
+	<div id="middle">
+		<br>
+		<button class="button" type="submit" name="submit" id="submit">SEARCH</button>
+	</div>
+</fieldset>
+</form>
+</div>
+
+<div class = "tablecontainer">
+<table id = "hiddentable">
+<thead>
+	<tr>
+		<th>Date</th>
+		<th>Icon</th>
+		<th>Event</th>
+		<th>Venue</th>
+	</tr>
+</thead>
+<tbody id="dataoutput">
+	
+
+</tbody>
+
+</table>
+</div>
+
+<div class="eventdetail-container">
+	<div id="eventoutput">
+	
+	</div>
+
+</div>
+<script src="index.js"></script>
+</body>
+</html>
